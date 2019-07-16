@@ -143,5 +143,24 @@ namespace BLL_Tests
 
             Assert.That(discount.Value, Is.EqualTo(80));
         }
+
+        [Test]
+        public void ApplyCoupon_Rate100_Returns10()
+        {
+
+            var category = new Category("food");
+            category.SubCategory = new List<Category>() { new Category("Sub1"), new Category("Sub2") };
+
+            var product = new Product("Apple", 100.0m, category.SubCategory[0]);
+            var product3 = new Product("Banana", 50.0m, category.SubCategory[0]);
+            var product2 = new Product("Almonds", 150.0m, category.SubCategory[1]);
+            var cart = new Cart("TestCart");
+
+            cart.AddProduct(product, 3);
+            cart.AddProduct(product3, 2);
+            cart.AddProduct(product2, 5);
+
+
+        }
     }
 }
