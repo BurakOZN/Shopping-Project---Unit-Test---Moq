@@ -4,4 +4,13 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="Repository\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DAL\DAL.csproj" />
+    <ProjectReference Include="..\Entity\Entity.csproj" />
+  </ItemGroup>
+
 </Project>
