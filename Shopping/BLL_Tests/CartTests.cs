@@ -163,9 +163,102 @@ namespace BLL_Tests
             Coupon coupon = new Coupon(100, 10, DiscountType.Rate);
 
 
-            var result =cart.ApplyCoupon(coupon);
+            var result =cart.ApplyDiscount(coupon);
 
             Assert.That(result, Is.EqualTo(1035));
+        }
+
+
+        [Test]
+        public void getTotalAmountAfterDiscounts_SomeProductCart_ReturnValue()
+        {
+
+            var category = new Category("food");
+            category.SubCategory = new List<Category>() { new Category("Sub1"), new Category("Sub2") };
+
+            var product = new Product("Apple", 100.0m, category.SubCategory[0]);
+            var product3 = new Product("Banana", 50.0m, category.SubCategory[0]);
+            var product2 = new Product("Almonds", 150.0m, category.SubCategory[1]);
+            var cart = new Cart("TestCart");
+
+            cart.AddProduct(product, 3);
+            cart.AddProduct(product3, 2);
+            cart.AddProduct(product2, 5);
+
+            var campaign = new Campaign(category.SubCategory[0], 20, 3, DiscountType.Rate);
+            Coupon coupon = new Coupon(100, 10, DiscountType.Rate);
+
+            var result = cart.getTotalAmountAfterDiscounts(campaign,coupon);
+
+            Assert.That(result, Is.EqualTo(963));
+        }
+
+        [Test]
+        public void getCouponDiscount_SomeProductCart_ReturnValue()
+        {
+
+            var category = new Category("food");
+            category.SubCategory = new List<Category>() { new Category("Sub1"), new Category("Sub2") };
+
+            var product = new Product("Apple", 100.0m, category.SubCategory[0]);
+            var product3 = new Product("Banana", 50.0m, category.SubCategory[0]);
+            var product2 = new Product("Almonds", 150.0m, category.SubCategory[1]);
+            var cart = new Cart("TestCart");
+
+            cart.AddProduct(product, 3);
+            cart.AddProduct(product3, 2);
+            cart.AddProduct(product2, 5);
+
+            Coupon coupon = new Coupon(100, 10, DiscountType.Rate);
+
+            var result = cart.getCouponDiscount(coupon);
+
+            Assert.That(result, Is.EqualTo(1035));
+        }
+
+        [Test]
+        public void getCampaignDiscount_SomeProductCart_ReturnValue()
+        {
+
+            var category = new Category("food");
+            category.SubCategory = new List<Category>() { new Category("Sub1"), new Category("Sub2") };
+
+            var product = new Product("Apple", 100.0m, category.SubCategory[0]);
+            var product3 = new Product("Banana", 50.0m, category.SubCategory[0]);
+            var product2 = new Product("Almonds", 150.0m, category.SubCategory[1]);
+            var cart = new Cart("TestCart");
+
+            cart.AddProduct(product, 3);
+            cart.AddProduct(product3, 2);
+            cart.AddProduct(product2, 5);
+
+            var campaign = new Campaign(category.SubCategory[0], 20, 3, DiscountType.Rate);
+
+            var result = cart.getCampaignDiscount(campaign);
+
+            Assert.That(result, Is.EqualTo(1070));
+        }
+
+        [Test]
+        public void getDeliveryCost_SomeProductCart_ReturnValue()
+        {
+
+            var category = new Category("food");
+            category.SubCategory = new List<Category>() { new Category("Sub1"), new Category("Sub2") };
+
+            var product = new Product("Apple", 100.0m, category.SubCategory[0]);
+            var product3 = new Product("Banana", 50.0m, category.SubCategory[0]);
+            var product2 = new Product("Almonds", 150.0m, category.SubCategory[1]);
+            var cart = new Cart("TestCart");
+
+            cart.AddProduct(product, 3);
+            cart.AddProduct(product3, 2);
+            cart.AddProduct(product2, 5);
+
+
+            var result = cart.getDeliveryCost(1,2,3);
+
+            Assert.That(result, Is.EqualTo(11));
         }
     }
 }
