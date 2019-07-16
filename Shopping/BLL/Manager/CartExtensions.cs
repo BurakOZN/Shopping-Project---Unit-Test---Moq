@@ -18,7 +18,7 @@ namespace BLL.Manager
             return cart;
         }
 
-        public static Campaign ApplyDiscounts(this Cart cart, List<Campaign> campaigns)
+        public static KeyValuePair<Campaign,decimal> ApplyDiscounts(this Cart cart, List<Campaign> campaigns)
         {
             Campaign campaign = null;
             Dictionary<Campaign, decimal> keyValuePairs = new Dictionary<Campaign, decimal>();
@@ -46,8 +46,8 @@ namespace BLL.Manager
                 }
 
             }
-            var result= keyValuePairs.OrderByDescending(x=>x.Value);
-            return result.FirstOrDefault().Key;
+            var result= keyValuePairs.OrderByDescending(x=>x.Value).FirstOrDefault();
+            return result;
         }
 
         private static decimal CalculateCampaign(this List<CartProduct> cartProduct,Campaign campaign)
