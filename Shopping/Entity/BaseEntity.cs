@@ -9,6 +9,7 @@ namespace Entity
 
         public BaseEntity()
         {
+            Id = Guid.NewGuid().ToString();
             IsActive = true;
         }
         public string Id { get; set; }

@@ -14,6 +14,7 @@ namespace Entity
             Title = title;
             Price = price;
             CategoryId = _category.Id;
+            Category = _category;
         }
         public string Title { get; set; }
         public decimal Price { get; set; }
