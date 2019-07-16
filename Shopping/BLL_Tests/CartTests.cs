@@ -160,7 +160,12 @@ namespace BLL_Tests
             cart.AddProduct(product3, 2);
             cart.AddProduct(product2, 5);
 
+            Coupon coupon = new Coupon(100, 10, DiscountType.Rate);
 
+
+            var result =cart.ApplyCoupon(coupon);
+
+            Assert.That(result, Is.EqualTo(1035));
         }
     }
 }
