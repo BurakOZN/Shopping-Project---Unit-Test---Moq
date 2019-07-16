@@ -81,9 +81,9 @@ namespace BLL_Tests
             cart.AddProduct(product2, 5);
 
 
-            var campaign = new Campaign(category.SubCategory[0], 20, 8, DiscountType.Rate);
-            var campaign2 = new Campaign(category.SubCategory[1], 50, 15, DiscountType.Rate);
-            var campaign3 = new Campaign(category, 5, 5, DiscountType.Amount);
+            var campaign = new Campaign(category.SubCategory[0], 20, 2, DiscountType.Rate);
+            var campaign2 = new Campaign(category.SubCategory[1], 50, 2, DiscountType.Rate);
+            var campaign3 = new Campaign(category, 500, 5, DiscountType.Amount);
             //var campaign3 = new Campaign(category, 5, 5, DiscountType.Amount);
 
             var discount = cart.ApplyDiscounts(new List<Campaign>() { campaign, campaign2, campaign3 });
@@ -165,7 +165,7 @@ namespace BLL_Tests
 
             var result =cart.ApplyDiscount(coupon);
 
-            Assert.That(result, Is.EqualTo(1035));
+            Assert.That(result, Is.EqualTo(115));
         }
 
 
@@ -213,7 +213,7 @@ namespace BLL_Tests
 
             var result = cart.getCouponDiscount(coupon);
 
-            Assert.That(result, Is.EqualTo(1035));
+            Assert.That(result, Is.EqualTo(115));
         }
 
         [Test]
@@ -236,7 +236,7 @@ namespace BLL_Tests
 
             var result = cart.getCampaignDiscount(campaign);
 
-            Assert.That(result, Is.EqualTo(1070));
+            Assert.That(result, Is.EqualTo(80));
         }
 
         [Test]

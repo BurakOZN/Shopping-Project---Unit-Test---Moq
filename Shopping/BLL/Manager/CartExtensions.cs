@@ -1,6 +1,7 @@
 ﻿using Entity;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 
@@ -73,27 +74,35 @@ namespace BLL.Manager
             return value;
         }
 
-        public static decimal ApplyDiscount(this Cart cart, Coupon coupon = null, Campaign campaign = null)
+        public static double ApplyDiscount(this Cart cart, Coupon coupon = null, Campaign campaign = null)
         {
-            decimal total = 0;
+            double total = cart.GetTotal();
+
+            if (campaign == null && coupon == null)
+                return 0;
+            if (campaign == null)
+                return total > coupon.Limit ? (coupon.DiscountType == DiscountType.Rate ? (coupon.Value / 100) * total : coupon.Value) : 0;
+            if (coupon == null)
+                return (double)cart.ApplyDiscounts(new List<Campaign>() { campaign }).Value;
+            var campDis = (double)cart.ApplyDiscounts(new List<Campaign>() { campaign }).Value;
+            total -= campDis;
+            var result = total > coupon.Limit ? (coupon.DiscountType == DiscountType.Rate ? (coupon.Value / 100) * total : coupon.Value) : 0;
+            return result + campDis;
+
+        }
+        public static double GetTotal(this Cart cart)
+        {
+            double total = 0;
             foreach (var item in cart.Products)
             {
-                total += item.Quantity * item.Product.Price;
+                total += (double)(item.Quantity * item.Product.Price);
             }
-            if (campaign == null && coupon == null)
-                return total;
-            if (campaign == null)
-                return total > coupon.Limit ? (coupon.DiscountType == DiscountType.Rate ? (1 - coupon.Value / 100) * total : total - coupon.Value) : total;
-            if (coupon == null)
-                return total - cart.ApplyDiscounts(new List<Campaign>() { campaign }).Value;
-            total -= cart.ApplyDiscounts(new List<Campaign>() { campaign }).Value;
-            return total > coupon.Limit ? (coupon.DiscountType == DiscountType.Rate ? (1 - coupon.Value / 100) * total : total - coupon.Value) : total;
-
+            return total;
         }
 
         public static double getTotalAmountAfterDiscounts(this Cart cart, Campaign campaign = null, Coupon coupon = null)
         {
-            return (double)cart.ApplyDiscount(coupon, campaign);
+            return (cart.GetTotal() - cart.ApplyDiscount(coupon, campaign));
 
         }
         public static double getCouponDiscount(this Cart cart, Coupon coupon)
@@ -109,8 +118,56 @@ namespace BLL.Manager
             return (new DeliveryCostCalculator(costPerDelivery, costPerProduct, fixedCost)).calculateFor(cart);
         }
 
+        public static bool Print(this Cart cart, Campaign campaign, Coupon coupon)
+        {
 
+            double Total = cart.GetTotal();
+            var campaignDiscount = cart.getCampaignDiscount(campaign);
 
+            var amauntTotal = cart.getTotalAmountAfterDiscounts(campaign, coupon);
+            var couponDiscount = Total - campaignDiscount - amauntTotal;
+
+            //For table
+            DataTable productTable = new DataTable();
+
+            //Define columns
+            productTable.Columns.Add("Kategori Adı");
+            productTable.Columns.Add("Ürün Adı");
+            productTable.Columns.Add("Miktar");
+            productTable.Columns.Add("Birim Fiyat");
+            productTable.Columns.Add("Toplam Fiyat");
+
+            var cx = cart.Products.GroupBy(x => x.Product.CategoryId);
+            var list = new List<CartProduct>();
+            foreach (var item in cx)
+            {
+                decimal categoryTotal = 0;
+                foreach (var cartProduct in item)
+                {
+                    categoryTotal += cartProduct.Product.Price * cartProduct.Quantity;
+                    productTable.Rows.Add(cartProduct.Product.Category.Title, cartProduct.Product.Title, cartProduct.Quantity, cartProduct.Product.Price.ToString(), cartProduct.Quantity * cartProduct.Product.Price);
+                }
+                productTable.Rows.Add("", "", "", "", categoryTotal);
+            }
+            productTable.Rows.Add("", "", "", "Toplam", Total);
+            productTable.Rows.Add("", "", "", "Kampanya ", "-" + campaignDiscount);
+            productTable.Rows.Add("", "", "", "Kupon", "-" + (couponDiscount));
+            productTable.Rows.Add("", "", "", "Ödeme Tutarı", amauntTotal);
+
+            try
+            {
+                DataTable dtbl = productTable;
+                IPrint print = new PrintPDF();
+                print.ExportDataTableToPdf(dtbl, @"C:\Datalar\test.pdf", "Ürün Listesi");
+
+            }
+            catch (Exception ex)
+            {
+                string exc = ex.Message;
+                return false;
+            }
+            return true;
+        }
 
     }
 }
